@@ -1,0 +1,402 @@
+{
+  "1": {
+    "x": 360,
+    "y": 859,
+    "width": 178,
+    "height": 197,
+    "name": "sticker_1_Girl-Pink-Duduk.png",
+    "depth": 12
+  },
+  "2": {
+    "x": 636,
+    "y": 1066,
+    "width": 163,
+    "height": 305,
+    "name": "sticker_2_Girl-Duduk.png",
+    "depth": 126
+  },
+  "3": {
+    "x": 202,
+    "y": 1157,
+    "width": 157,
+    "height": 359,
+    "name": "sticker_3_Girl-Tea-2.png",
+    "depth": 135
+  },
+  "4": {
+    "x": 40,
+    "y": 773,
+    "width": 194,
+    "height": 116,
+    "name": "sticker_4_Telfon.png",
+    "depth": 15
+  },
+  "5": {
+    "x": 380,
+    "y": 200,
+    "width": 121,
+    "height": 145,
+    "name": "sticker_5_Pigora-Gunung.png",
+    "depth": 40
+  },
+  "6": {
+    "x": 837,
+    "y": 30,
+    "width": 71,
+    "height": 147,
+    "name": "sticker_6_Pewangi-Ruangan.png",
+    "depth": 10
+  },
+  "7": {
+    "x": 742,
+    "y": 701,
+    "width": 235,
+    "height": 170,
+    "name": "sticker_7_Meja.png",
+    "depth": 10
+  },
+  "8": {
+    "x": 511,
+    "y": 1123,
+    "width": 136,
+    "height": 140,
+    "name": "sticker_8_Majalah.png",
+    "depth": 127
+  },
+  "9": {
+    "x": 885,
+    "y": 1150,
+    "width": 191,
+    "height": 362,
+    "name": "sticker_9_Ibu-Masak.png",
+    "depth": 151.1
+  },
+  "10": {
+    "x": 7,
+    "y": 847,
+    "width": 286,
+    "height": 179,
+    "name": "sticker_10_Kursi.png",
+    "depth": 10
+  },
+  "11": {
+    "x": 278,
+    "y": 340,
+    "width": 179,
+    "height": 269,
+    "name": "sticker_11_Girl-Sleep.png",
+    "depth": 11
+  },
+  "12": {
+    "x": 703,
+    "y": 6,
+    "width": 163,
+    "height": 170,
+    "name": "sticker_12_Buku.png",
+    "depth": 8
+  },
+  "13": {
+    "x": 827,
+    "y": 652,
+    "width": 147,
+    "height": 98,
+    "name": "sticker_13_Cheesecake.png",
+    "depth": 40
+  },
+  "14": {
+    "x": 298,
+    "y": 978,
+    "width": 531,
+    "height": 207,
+    "name": "sticker_14_Karpet.png",
+    "depth": 5
+  },
+  "15": {
+    "x": -20,
+    "y": 980,
+    "width": 171,
+    "height": 103,
+    "name": "sticker_15_Water.png",
+    "depth": 124
+  },
+  "16": {
+    "x": 314,
+    "y": 590,
+    "width": 171,
+    "height": 157,
+    "name": "sticker_16_Remote.png",
+    "depth": 79
+  },
+  "17": {
+    "x": 372,
+    "y": 17,
+    "width": 139,
+    "height": 138,
+    "name": "sticker_17_Jam-Dinding.png",
+    "depth": 21
+  },
+  "18": {
+    "x": 624,
+    "y": 409,
+    "width": 183,
+    "height": 161,
+    "name": "sticker_18_Bantal.png",
+    "depth": 11
+  },
+  "19": {
+    "x": 650,
+    "y": 892,
+    "width": 190,
+    "height": 172,
+    "name": "sticker_19_Bayi.png",
+    "depth": 109
+  },
+  "20": {
+    "x": 588,
+    "y": 1244,
+    "width": 152,
+    "height": 347,
+    "name": "sticker_20_Boy-Kucing.png",
+    "depth": 128
+  },
+  "21": {
+    "x": 126,
+    "y": 1054,
+    "width": 184,
+    "height": 128,
+    "name": "sticker_21_Keys.png",
+    "depth": 125
+  },
+  "22": {
+    "x": 31,
+    "y": 599,
+    "width": 119,
+    "height": 149,
+    "name": "sticker_22_Bear.png",
+    "depth": 79
+  },
+  "23": {
+    "x": 693,
+    "y": 230,
+    "width": 105,
+    "height": 142,
+    "name": "sticker_23_Pigora-Tulip.png",
+    "depth": 43
+  },
+  "24": {
+    "x": 530,
+    "y": 805,
+    "width": 118,
+    "height": 153,
+    "name": "sticker_24_Balok-Menara.png",
+    "depth": 100
+  },
+  "25": {
+    "x": 813,
+    "y": 1019,
+    "width": 143,
+    "height": 297,
+    "name": "sticker_25_Boy-Juice.png",
+    "depth": 151
+  },
+  "26": {
+    "x": 25,
+    "y": 293,
+    "width": 293,
+    "height": 381,
+    "name": "sticker_26_Pot.png",
+    "depth": 11
+  },
+  "27": {
+    "x": 864,
+    "y": 357,
+    "width": 141,
+    "height": 315,
+    "name": "sticker_27_Boy-Hide-Lamp.png",
+    "depth": 10
+  },
+  "28": {
+    "x": 564,
+    "y": 952,
+    "width": 105,
+    "height": 154,
+    "name": "sticker_28_Dot-Susu.png",
+    "depth": 12
+  },
+  "29": {
+    "x": 154,
+    "y": 607,
+    "width": 284,
+    "height": 146,
+    "name": "sticker_29_Yarn.png",
+    "depth": 12
+  },
+  "30": {
+    "x": 541,
+    "y": 180,
+    "width": 118,
+    "height": 191,
+    "name": "sticker_30_Dekorasi.png",
+    "depth": 10
+  },
+  "31": {
+    "x": 728,
+    "y": 824,
+    "width": 199,
+    "height": 318,
+    "name": "sticker_31_Ibu-Bayi.png",
+    "depth": 150
+  },
+  "32": {
+    "x": 332,
+    "y": 995,
+    "width": 157,
+    "height": 258,
+    "name": "sticker_32_Boy-Duduk-Sila.png",
+    "depth": 12
+  },
+  "33": {
+    "x": 7,
+    "y": 517,
+    "width": 100,
+    "height": 151,
+    "name": "sticker_33_Tong-Sampah.png",
+    "depth": 71
+  },
+  "34": {
+    "x": 876,
+    "y": 18,
+    "width": 126,
+    "height": 158,
+    "name": "sticker_34_Kaktus.png",
+    "depth": 8
+  },
+  "35": {
+    "x": 589,
+    "y": 565,
+    "width": 196,
+    "height": 313,
+    "name": "sticker_35_Boy-Cookie.png",
+    "depth": 76
+  },
+  "36": {
+    "x": 350,
+    "y": 1208,
+    "width": 264,
+    "height": 358,
+    "name": "sticker_36_Boy-Plane.png",
+    "depth": 128
+  },
+  "37": {
+    "x": 220,
+    "y": 738,
+    "width": 253,
+    "height": 162,
+    "name": "sticker_37_Boy-Tiduran.png",
+    "depth": 11
+  },
+  "38": {
+    "x": 950,
+    "y": 510,
+    "width": 146,
+    "height": 295,
+    "name": "sticker_38_Boy-Laper.png",
+    "depth": 75
+  },
+  "39": {
+    "x": 773,
+    "y": 1239,
+    "width": 173,
+    "height": 347,
+    "name": "sticker_39_Bapak-Mau-Makan.png",
+    "depth": 152
+  },
+  "40": {
+    "x": 5,
+    "y": 1120,
+    "width": 246,
+    "height": 442,
+    "name": "sticker_40_Girl-Tea-1.png",
+    "depth": 135
+  },
+  "41": {
+    "x": 445,
+    "y": 609,
+    "width": 147,
+    "height": 318,
+    "name": "sticker_41_Boy-Telp.png",
+    "depth": 80
+  },
+  "42": {
+    "x": 525,
+    "y": 6,
+    "width": 207,
+    "height": 169,
+    "name": "sticker_42_Cicak.png",
+    "depth": 8
+  },
+  "43": {
+    "x": 742,
+    "y": 661,
+    "width": 123,
+    "height": 85,
+    "name": "sticker_43_Teh.png",
+    "depth": 15
+  },
+  "44": {
+    "x": 182,
+    "y": 844,
+    "width": 159,
+    "height": 250,
+    "name": "sticker_44_Girl-Read.png",
+    "depth": 104
+  },
+  "45": {
+    "x": 821,
+    "y": 241,
+    "width": 152,
+    "height": 153,
+    "name": "sticker_45_Gantungan-Topi.png",
+    "depth": 9
+  },
+  "46": {
+    "x": 669,
+    "y": 801,
+    "width": 155,
+    "height": 90,
+    "name": "sticker_46_Truck.png",
+    "depth": 100
+  },
+  "47": {
+    "x": 438,
+    "y": 444,
+    "width": 204,
+    "height": 145,
+    "name": "sticker_47_Cat.png",
+    "depth": 12
+  },
+  "48": {
+    "x": 912,
+    "y": 789,
+    "width": 168,
+    "height": 315,
+    "name": "sticker_48_Girl-Boneka.png",
+    "depth": 98
+  },
+  "49": {
+    "x": 467,
+    "y": 995,
+    "width": 144,
+    "height": 119,
+    "name": "sticker_49_Balok-Angka.png",
+    "depth": 12
+  },
+  "50": {
+    "x": 310,
+    "y": 385,
+    "width": 208,
+    "height": 122,
+    "name": "sticker_50_Blanket.png",
+    "depth": 10
+  }
+}
