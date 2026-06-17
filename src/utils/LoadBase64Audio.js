@@ -32,20 +32,9 @@ export function LoadBase64Audio (scene, audioFiles)
 
         scene.sound.decodeAudio(audioFiles);
 
-        // iOS Safari/WebViews: the AudioContext starts suspended before the
-        // first user gesture.  decodeAudioData() may silently produce empty
-        // buffers in that state.  Schedule a re-decode after Phaser unlocks
-        // the context so the buffers are replaced with valid audio data.
-        if (scene.sound.locked)
-        {
-            scene.sound.once('unlocked', () => {
-                scene.sound.removeByKey('audio_bgm');
-                scene.sound.removeByKey('audio_correct');
-                scene.sound.removeByKey('audio_wrong');
-                scene.sound.removeByKey('audio_finished');
-                scene.sound.decodeAudio(audioFiles);
-            });
-        }
+        // The iOS re-decode logic was removed because it destroys the audio cache 
+        // right as the game tries to play BGM, causing it to fail. Modern iOS 
+        // successfully decodes Web Audio while suspended.
     }
     else
     {

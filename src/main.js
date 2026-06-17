@@ -54,7 +54,7 @@ const gameConfig = {
     ],
   },
   audio: {
-    disableWebAudio: true,
+    disableWebAudio: false,
   },
   scene: [Preloader, Game, EndScene],
 };

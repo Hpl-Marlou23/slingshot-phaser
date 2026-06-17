@@ -459,8 +459,25 @@ export class Game extends Phaser.Scene {
       this.dragPointer = null;
 
       // Apply throw impulse based on flick speed
-      const vx = pointer.velocity.x * 0.15;
-      const vy = pointer.velocity.y * 0.15;
+      let vx = pointer.velocity.x * 0.15;
+      let vy = pointer.velocity.y * 0.15;
+
+      // Fallback in case of NaN/Infinity on quick taps (especially on iOS)
+      if (!isFinite(vx)) vx = 0;
+      if (!isFinite(vy)) vy = 0;
+      
+      // If the user just tapped without dragging, don't throw it at all.
+      // The pointer.velocity can sometimes spike on the very first touch due to spawning from (0,0).
+      const dragDistance = Phaser.Math.Distance.Between(pointer.downX, pointer.downY, pointer.upX, pointer.upY);
+      if (dragDistance < 15) {
+        vx = 0;
+        vy = 0;
+      }
+
+      // Clamp to prevent physics explosions from insanely fast flicks
+      vx = Phaser.Math.Clamp(vx, -60, 60);
+      vy = Phaser.Math.Clamp(vy, -60, 60);
+
       gameObject.setVelocity(vx, vy);
 
       // Return hero to idle animation
@@ -954,7 +971,9 @@ export class Game extends Phaser.Scene {
       }
 
       // Snap car to ground and update tutorial hand tween (add offset for wheels)
-      if (this.car && this.car.body) {
+      // We only do this if the game hasn't started yet (!this.tutorialDismissed), 
+      // because forcing a physics body's position during a drag or mid-flight causes it to explode/disappear.
+      if (this.car && this.car.body && !this.tutorialDismissed) {
         // Car original texture has ~90px of transparent padding at the bottom
         const carTexturePadding = 90;
         this.car.y = groundTop - ((this.car.height / 2) - carTexturePadding) * this.car.scaleY;
