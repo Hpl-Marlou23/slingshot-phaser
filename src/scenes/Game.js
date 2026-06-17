@@ -376,7 +376,7 @@ export class Game extends Phaser.Scene {
         this.bgm.play();
       }
       this._dismissTutorial();
-      
+
       // Start 30s timer on first interaction if configured
       if (config.version === '30s' && !this._timerStarted) {
         this._timerStarted = true;
@@ -415,20 +415,14 @@ export class Game extends Phaser.Scene {
         { isStatic: true, isSensor: true, label: 'carDragAnchor' }
       );
 
-      const dx = pointer.worldX - gameObject.x;
-      const dy = pointer.worldY - gameObject.y;
-      const angle = -gameObject.rotation;
-      const localPoint = {
-        x: dx * Math.cos(angle) - dy * Math.sin(angle),
-        y: dx * Math.sin(angle) + dy * Math.cos(angle)
-      };
-
+      // Always attach the spring to the car's center of mass {x: 0, y: 0}
+      // instead of the clicked offset. This completely prevents the spring 
+      // from applying massive rotational torque and spinning the car wildly.
       this.carDragConstraint = this.matter.add.constraint(
         gameObject.body, this.carDragBody, 0, 0.2, {
-        pointA: localPoint,
+        pointA: { x: 0, y: 0 },
         damping: 0.1
-      }
-      );
+      });
 
       // Remove car glow & pulse
       this._dismissCarHighlight();
@@ -842,8 +836,8 @@ export class Game extends Phaser.Scene {
       // Reset arm rotation when not slinging
       if (this.heroArm) this.heroArm.setRotation(0);
 
-      if (this.tutorialHand && !this.isGameOver && !this.tutorialGroup.visible) {
-        // Ensure it stays hidden if we aren't dragging and tutorial is over
+      if (this.tutorialHand) {
+        // Ensure it stays hidden when we aren't dragging or if the game is over
         this.tutorialHand.setVisible(false);
       }
     }
@@ -864,6 +858,16 @@ export class Game extends Phaser.Scene {
     }
     this.draggedObject = null;
     this.dragPointer = null;
+
+    if (this.mouseSpring) {
+      if (typeof this.mouseSpring.stopDrag === 'function') {
+        this.mouseSpring.stopDrag();
+      }
+      if (this.mouseSpring.constraint) {
+        this.matter.world.removeConstraint(this.mouseSpring.constraint);
+      }
+      this.mouseSpring = null;
+    }
 
     // Disable all player input — physics and rendering keep running
     this.input.enabled = false;
@@ -922,8 +926,15 @@ export class Game extends Phaser.Scene {
       this.matter.world.setBounds(cameraLeft, 0, screenWidthInGameCoords, groundTop);
 
       if (this.matterGround) {
-        Phaser.Physics.Matter.Matter.Body.setPosition(this.matterGround, { x: this.ground.x, y: this.ground.y });
+        this.matter.world.remove(this.matterGround);
       }
+      this.matterGround = this.matter.add.rectangle(
+        this.ground.x,
+        this.ground.y,
+        screenWidthInGameCoords,
+        this.ground.displayHeight,
+        { isStatic: true, label: 'floor', friction: 0.9, restitution: 0 }
+      );
 
       // Snap hero to ground (add offset for transparent padding in sprite)
       if (this.hero) {

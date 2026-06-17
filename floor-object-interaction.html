@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser 3 - Collision Safe Drag</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #20242b;
+            overflow: hidden;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+        }
+
+        canvas {
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        class GameScene extends Phaser.Scene {
+            constructor() {
+                super('GameScene');
+            }
+
+            preload() {
+                this.load.image('car', 'car.png');
+                this.load.image('floating-floor', 'floating-floor.png');
+            }
+
+            create() {
+                this.cameras.main.setBackgroundColor('#1f2933');
+
+                /*
+                 * Matter Physics stays in charge of the bodies. Dragging is kinematic:
+                 * the pointer asks for a target position, then moveWithCollision() walks
+                 * the Matter body toward it in small steps. Each candidate step is tested
+                 * with Matter.Query.collides() before the move is committed.
+                 */
+                this.obstacles = [];
+
+                this.addObstacle(400, 405, 230, 48, 'floating-floor');
+
+                this.car = this.matter.add.image(400, 115, 'car');
+                this.car.setScale(0.2);
+                this.car.setBody({
+                    type: 'rectangle',
+                    width: this.car.width * this.car.scaleX,
+                    height: this.car.height * this.car.scaleY
+                });
+                this.car.setFixedRotation();
+                this.car.setFriction(0.2);
+                this.car.setBounce(0);
+                this.car.setInteractive({ useHandCursor: true });
+
+                this.dragState = null;
+
+                /*
+                 * Use pointer capture style dragging instead of Phaser's draggable
+                 * events. When the car is blocked by a collider, the pointer can move
+                 * away from the car; this keeps the grab active until pointerup.
+                 */
+                this.car.on('pointerdown', (pointer) => {
+                    this.car.setVelocity(0, 0);
+                    this.car.setAngularVelocity(0);
+                    this.car.setIgnoreGravity(true);
+                    this.dragState = {
+                        pointerId: pointer.id,
+                        object: this.car,
+                        offsetX: this.car.x - pointer.worldX,
+                        offsetY: this.car.y - pointer.worldY,
+                        targetX: this.car.x,
+                        targetY: this.car.y,
+                        wasStatic: this.car.body.isStatic
+                    };
+                    this.car.setStatic(true);
+                });
+
+                this.input.on('pointermove', (pointer) => {
+                    if (!this.dragState || pointer.id !== this.dragState.pointerId || !pointer.isDown) return;
+
+                    this.dragState.targetX = pointer.worldX + this.dragState.offsetX;
+                    this.dragState.targetY = pointer.worldY + this.dragState.offsetY;
+                });
+
+                this.input.on('pointerup', (pointer) => {
+                    if (!this.dragState || pointer.id !== this.dragState.pointerId) return;
+
+                    this.endDrag();
+                });
+
+                this.input.on('pointerupoutside', (pointer) => {
+                    if (!this.dragState || pointer.id !== this.dragState.pointerId) return;
+
+                    this.endDrag();
+                });
+
+                this.add.text(20, 18, 'Drag the car quickly. It stops at obstacle boundaries without tunneling.', {
+                    fontFamily: 'Arial',
+                    fontSize: '16px',
+                    color: '#ffffff'
+                });
+
+                this.add.text(20, 45, 'The debug outline shows the car collision body and floating floor collider.', {
+                    fontFamily: 'Arial',
+                    fontSize: '13px',
+                    color: '#b8c7d9'
+                });
+            }
+
+            update() {
+                if (!this.dragState) return;
+
+                const pointer = this.input.manager.pointers.find((item) => {
+                    return item.id === this.dragState.pointerId;
+                });
+
+                if (!pointer || !pointer.isDown) {
+                    this.endDrag();
+                    return;
+                }
+
+                /*
+                 * Keep solving toward the latest pointer target every frame. This keeps
+                 * the object feeling attached to the held mouse even after collision has
+                 * temporarily stopped it at a boundary.
+                 */
+                this.moveWithCollision(this.dragState.object, this.dragState.targetX, this.dragState.targetY);
+            }
+
+            addObstacle(x, y, width, height, textureKey) {
+                let obstacle;
+
+                if (textureKey) {
+                    obstacle = this.matter.add.image(x, y, textureKey, null, { isStatic: true });
+                    obstacle.displayWidth = width;
+                    obstacle.displayHeight = height;
+                    obstacle.setBody({
+                        type: 'rectangle',
+                        width,
+                        height
+                    }, { isStatic: true });
+                } else {
+                    obstacle = this.add.rectangle(x, y, width, height, 0x3d7ea6, 0.95);
+                    this.matter.add.gameObject(obstacle, {
+                        isStatic: true,
+                        shape: {
+                            type: 'rectangle',
+                            width,
+                            height
+                        }
+                    });
+                }
+
+                this.obstacles.push(obstacle.body);
+                return obstacle;
+            }
+
+            endDrag() {
+                this.dragState.object.setVelocity(0, 0);
+                this.dragState.object.setIgnoreGravity(false);
+                this.dragState.object.setStatic(this.dragState.wasStatic);
+                this.dragState = null;
+            }
+
+            moveWithCollision(sprite, targetX, targetY) {
+                const dx = targetX - sprite.x;
+                const dy = targetY - sprite.y;
+
+                if (dx === 0 && dy === 0) return;
+
+                /*
+                 * Broadphase: only test obstacles that could intersect the swept area.
+                 * This keeps the expensive per-step checks small when many objects exist.
+                 */
+                const candidates = this.getSweptCandidates(sprite, targetX, targetY);
+
+                /*
+                 * Axis-separated motion gives the expected "slide along walls" feel.
+                 * If you want no sliding, stop Y when X collides, or vice versa.
+                 */
+                const movedX = this.moveAxis(sprite, dx, 0, candidates);
+                const movedY = this.moveAxis(sprite, 0, dy, candidates);
+
+                if (movedX || movedY) {
+                    sprite.setVelocity(0, 0);
+                    sprite.setAngularVelocity(0);
+                }
+            }
+
+            moveAxis(sprite, dx, dy, candidates) {
+                const distance = Math.hypot(dx, dy);
+                if (distance === 0) return false;
+
+                /*
+                 * A smaller step is stricter. Four pixels is usually smooth and cheap.
+                 * The final remainder step keeps the object as close as possible to the
+                 * pointer without crossing into an obstacle.
+                 */
+                const maxStep = 4;
+                const steps = Math.ceil(distance / maxStep);
+                const stepX = dx / steps;
+                const stepY = dy / steps;
+                let moved = false;
+
+                for (let i = 0; i < steps; i++) {
+                    const nextX = sprite.x + stepX;
+                    const nextY = sprite.y + stepY;
+
+                    if (this.wouldOverlap(sprite, nextX, nextY, candidates)) {
+                        /*
+                         * Refine the last legal position with a tiny binary search. This
+                         * avoids the visible gap that pure fixed stepping can leave.
+                         */
+                        this.moveAsFarAsPossible(sprite, stepX, stepY, candidates);
+                        return moved;
+                    }
+
+                    this.setMatterPosition(sprite, nextX, nextY);
+                    moved = true;
+                }
+
+                return moved;
+            }
+
+            moveAsFarAsPossible(sprite, dx, dy, candidates) {
+                let low = 0;
+                let high = 1;
+
+                for (let i = 0; i < 8; i++) {
+                    const mid = (low + high) / 2;
+                    const testX = sprite.x + dx * mid;
+                    const testY = sprite.y + dy * mid;
+
+                    if (this.wouldOverlap(sprite, testX, testY, candidates)) {
+                        high = mid;
+                    } else {
+                        low = mid;
+                    }
+                }
+
+                if (low > 0) {
+                    this.setMatterPosition(sprite, sprite.x + dx * low, sprite.y + dy * low);
+                }
+            }
+
+            setMatterPosition(sprite, x, y) {
+                this.matter.body.setPosition(sprite.body, { x, y });
+                sprite.x = x;
+                sprite.y = y;
+            }
+
+            getSweptCandidates(sprite, targetX, targetY) {
+                const bounds = sprite.body.bounds;
+                const halfW = (bounds.max.x - bounds.min.x) / 2;
+                const halfH = (bounds.max.y - bounds.min.y) / 2;
+
+                const minX = Math.min(sprite.x, targetX) - halfW;
+                const minY = Math.min(sprite.y, targetY) - halfH;
+                const maxX = Math.max(sprite.x, targetX) + halfW;
+                const maxY = Math.max(sprite.y, targetY) + halfH;
+                const sweptBounds = new Phaser.Geom.Rectangle(minX, minY, maxX - minX, maxY - minY);
+
+                return this.obstacles.filter((body) => {
+                    const bodyBounds = new Phaser.Geom.Rectangle(
+                        body.bounds.min.x,
+                        body.bounds.min.y,
+                        body.bounds.max.x - body.bounds.min.x,
+                        body.bounds.max.y - body.bounds.min.y
+                    );
+
+                    return Phaser.Geom.Intersects.RectangleToRectangle(sweptBounds, bodyBounds);
+                });
+            }
+
+            wouldOverlap(sprite, nextX, nextY, candidates) {
+                const body = sprite.body;
+                const currentX = body.position.x;
+                const currentY = body.position.y;
+                const halfW = (body.bounds.max.x - body.bounds.min.x) / 2;
+                const halfH = (body.bounds.max.y - body.bounds.min.y) / 2;
+                const left = nextX - halfW;
+                const top = nextY - halfH;
+                const testBounds = new Phaser.Geom.Rectangle(left, top, halfW * 2, halfH * 2);
+
+                if (left < 0 || top < 0 || testBounds.right > this.scale.width || testBounds.bottom > this.scale.height) {
+                    return true;
+                }
+
+                this.matter.body.setPosition(body, { x: nextX, y: nextY });
+                const hits = Phaser.Physics.Matter.Matter.Query.collides(body, candidates);
+                this.matter.body.setPosition(body, { x: currentX, y: currentY });
+
+                return hits.length > 0;
+            }
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: document.body,
+            physics: {
+                default: 'matter',
+                matter: {
+                    gravity: { y: 2 },
+                    debug: true
+                }
+            },
+            scene: GameScene
+        };
+
+        new Phaser.Game(config);
+    </script>
+</body>
+
+</html>

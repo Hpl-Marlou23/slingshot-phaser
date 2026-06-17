@@ -65,15 +65,15 @@ function initializePhaserGame() {
 
 function bindResponsiveResize(game) {
   const getViewportSize = () => {
+    let w = window.innerWidth;
+    let h = window.innerHeight;
     if (window.visualViewport) {
-      return {
-        width: Math.max(Math.round(window.visualViewport.width), 1),
-        height: Math.max(Math.round(window.visualViewport.height), 1),
-      };
+      w = window.visualViewport.width;
+      h = window.visualViewport.height;
     }
     return {
-      width: Math.max(window.innerWidth, 1),
-      height: Math.max(window.innerHeight, 1),
+      width: Math.max(Math.ceil(w), 1),
+      height: Math.max(Math.ceil(h), 1),
     };
   };
 
@@ -84,19 +84,17 @@ function bindResponsiveResize(game) {
     }
     const { width, height } = getViewportSize();
     const container = document.getElementById("ad-container");
-    const app = document.getElementById("app");
+    // We intentionally DO NOT resize #app here so it maintains its 100% 100vh CSS rules.
+    // This prevents top-left alignment gaps if the viewport width is a fractional pixel.
 
     if (container) {
       container.style.width = `${width}px`;
       container.style.height = `${height}px`;
     }
-    if (app) {
-      app.style.width = `${width}px`;
-      app.style.height = `${height}px`;
-    }
 
     const dpr = window.devicePixelRatio || 1;
-    game.scale.resize(width * dpr, height * dpr);
+    // Use Math.ceil to ensure we cover the entire screen even with fractional pixel ratios
+    game.scale.resize(Math.ceil(width * dpr), Math.ceil(height * dpr));
 
     // Scale.NONE requires manual CSS sizing, otherwise the canvas physically overflows on retina displays
     game.canvas.style.width = `${width}px`;
